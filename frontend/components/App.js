@@ -33,28 +33,27 @@ const initialErrors = {
   favFood: "",
   agreement: "",
 };
-const initialFailure = true;
 
 // ✨ TASK: BUILD YOUR FORM SCHEMA HERE
 // The schema should use the error messages contained in the object above.
 
-const formSchema = yup.object().shape({
-  username: yup
-    .string()
-    .trim()
-    .required(e.usernameRequired)
-    .min(3, e.usernameMin)
-    .max(20, e.usernameMax),
-  favLanguage: yup
-    .string()
-    .required(e.favLanguageRequired)
-    .oneOf(["javascript", "rust"], e.favLanguageOptions),
-  favFood: yup
-    .string()
-    .required(e.favFoodRequired)
-    .oneOf(["pizza", "spaghetti", "broccoli"], e.favFoodOptions),
-  agreement: yup.boolean().oneOf([true], e.agreementOptions).required(),
-});
+// const formSchema = yup.object().shape({
+//   username: yup
+//     .string()
+//     .trim()
+//     .required(e.usernameRequired)
+//     .min(3, e.usernameMin)
+//     .max(20, e.usernameMax),
+//   favLanguage: yup
+//     .string()
+//     .required(e.favLanguageRequired)
+//     .oneOf(["javascript", "rust"], e.favLanguageOptions),
+//   favFood: yup
+//     .string()
+//     .required(e.favFoodRequired)
+//     .oneOf(["pizza", "spaghetti", "broccoli"], e.favFoodOptions),
+//   agreement: yup.boolean().oneOf([true], e.agreementOptions).required(),
+// });
 
 export default function App() {
   // ✨ TASK: BUILD YOUR STATES HERE
@@ -71,11 +70,11 @@ export default function App() {
   // Whenever the state of the form changes, validate it against the schema
   // and update the state that tracks whether the form is submittable.
 
-  useEffect(() => {
-    formSchema.isValid(formValues).then((isValid) => {
-      setEnabled(isValid);
-    });
-  }, [formValues]);
+  // useEffect(() => {
+  //   formSchema.isValid(formValues).then((isValid) => {
+  //     setEnabled(isValid);
+  //   });
+  // }, [formValues]);
 
   const onChange = (evt) => {
     // ✨ TASK: IMPLEMENT YOUR INPUT CHANGE HANDLER
@@ -83,6 +82,9 @@ export default function App() {
     // whether the type of event target is "checkbox" and act accordingly.
     // At every change, you should validate the updated value and send the validation
     // error to the state where we track frontend validation errors.
+    let { type, name, value, checked } = evt.target;
+    value = type === "checkbox" ? checked : value;
+    setFormValues({ ...formValues, [name]: value });
   };
   const onSubmit = (evt) => {
     // ✨ TASK: IMPLEMENT YOUR SUBMIT HANDLER
@@ -92,6 +94,7 @@ export default function App() {
     // in the states you have reserved for them, and the form
     // should be re-enabled.
     evt.preventDefault();
+    axios.post("https://webapis.bloomtechdev.com/registration");
   };
 
   return (
@@ -100,21 +103,21 @@ export default function App() {
       {/* TASK: COMPLETE THE JSX */}
       <h2>Create an Account</h2>
       <form onSubmit={onSubmit}>
-        {formSuccess && (
-          <h4 className="success">Success! Welcome, new user!</h4>
-        )}
-        {formFailure && <h4 className="error">Sorry! Username is taken</h4>}
+        {formSuccess && <h4 className="success">{formSuccess}</h4>}
+        {formFailure && <h4 className="error">{formFailure}</h4>}
 
         <div className="inputGroup">
           <label htmlFor="username">Username:</label>
           <input
+            onChange={onChange}
+            value={formValues.username}
             id="username"
             name="username"
             type="text"
             placeholder="Type Username"
           />
           {formErrors.username && (
-            <div className="validation">username is required</div>
+            <div className="validation">{formErrors.username}</div>
           )}
         </div>
 
@@ -127,6 +130,7 @@ export default function App() {
                 type="radio"
                 name="favLanguage"
                 value="javascript"
+                checked={formValues.favLanguage === "javascript"}
               />
               JavaScript
             </label>
@@ -136,35 +140,47 @@ export default function App() {
                 type="radio"
                 name="favLanguage"
                 value="rust"
+                checked={formValues.favLanguage === "rust"}
               />
               Rust
             </label>
           </fieldset>
           {formErrors.favLanguage && (
-            <div className="validation">favLanguage is required</div>
+            <div className="validation">{formErrors.favLanguage}</div>
           )}
         </div>
 
         <div className="inputGroup">
           <label htmlFor="favFood">Favorite Food:</label>
-          <select id="favFood" name="favFood">
+          <select
+            value={formValues.favFood}
+            onChange={onChange}
+            id="favFood"
+            name="favFood"
+          >
             <option value="">-- Select Favorite Food --</option>
             <option value="pizza">Pizza</option>
             <option value="spaghetti">Spaghetti</option>
             <option value="broccoli">Broccoli</option>
           </select>
           {formErrors.favFood && (
-            <div className="validation">favFood is required</div>
+            <div className="validation">{formErrors.favFood}</div>
           )}
         </div>
 
         <div className="inputGroup">
           <label>
-            <input id="agreement" type="checkbox" name="agreement" />
+            <input
+              checked={formValues.agreement}
+              onChange={onChange}
+              id="agreement"
+              type="checkbox"
+              name="agreement"
+            />
             Agree to our terms
           </label>
           {formErrors.agreement && (
-            <div className="validation">agreement is required</div>
+            <div className="validation">{formErrors.agreement}</div>
           )}
         </div>
 
