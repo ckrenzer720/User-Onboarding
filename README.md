@@ -34,7 +34,12 @@ From the point of view of the data, each user registration POSTed to the endpoin
 
 ### Endpoints
 
-👉 The registration **endpoint** is `[POST] https://webapis.bloomtechdev.com/registration`
+👉 The registration **endpoint** is `[POST] {
+  "username": "Luke", 
+  "favFood": "pizza", 
+  "favLanguage": "javascript", 
+  "agreement": true 
+}`
 
 👉 Your fully-functional **design mock** is https://bloominstituteoftechnology.github.io/W_S7M3_Project
 
