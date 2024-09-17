@@ -76,9 +76,7 @@ export default function App() {
   // and update the state that tracks whether the form is submittable.
 
   useEffect(() => {
-    formSchema.isValid(formValues).then((isValid) => {
-      setEnabled(isValid);
-    });
+    formSchema.isValid(formValues).then(setEnabled);
   }, [formValues]);
 
   const onChange = (evt) => {
@@ -90,6 +88,11 @@ export default function App() {
     let { type, name, value, checked } = evt.target;
     value = type === "checkbox" ? checked : value;
     setFormValues({ ...formValues, [name]: value });
+    yup
+    .reach(formSchema, name)
+    .validate(value)
+    .then(() => setFormErrors({ ...formErrors, [name]: "" }))
+    .catch(err => setFormErrors({ ...formErrors, [name]: err.errors[0] }))
   };
   const onSubmit = (evt) => {
     // ✨ TASK: IMPLEMENT YOUR SUBMIT HANDLER
