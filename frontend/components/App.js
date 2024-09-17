@@ -21,6 +21,29 @@ const e = {
   agreementOptions: "agreement must be accepted",
 };
 
+const formSchema = yup.object().shape({
+  username: yup
+    .string()
+    .trim()
+    .required(e.usernameRequired)
+    .min(3, e.usernameMin)
+    .max(20, e.usernameMax),
+  favLanguage: yup
+    .string()
+    .required(e.favLanguageRequired)
+    .trim()
+    .oneOf(["javascript", "rust"], e.favLanguageOptions),
+  favFood: yup
+    .string()
+    .required(e.favFoodRequired)
+    .trim()
+    .oneOf(["pizza", "spaghetti", "broccoli"], e.favFoodOptions),
+  agreement: yup
+    .boolean()
+    .required(e.agreementRequired)
+    .oneOf([true], e.agreementOptions),
+});
+
 const initialFormValues = {
   username: "",
   favLanguage: "",
@@ -37,24 +60,6 @@ const initialErrors = {
 // ✨ TASK: BUILD YOUR FORM SCHEMA HERE
 // The schema should use the error messages contained in the object above.
 
-// const formSchema = yup.object().shape({
-//   username: yup
-//     .string()
-//     .trim()
-//     .required(e.usernameRequired)
-//     .min(3, e.usernameMin)
-//     .max(20, e.usernameMax),
-//   favLanguage: yup
-//     .string()
-//     .required(e.favLanguageRequired)
-//     .oneOf(["javascript", "rust"], e.favLanguageOptions),
-//   favFood: yup
-//     .string()
-//     .required(e.favFoodRequired)
-//     .oneOf(["pizza", "spaghetti", "broccoli"], e.favFoodOptions),
-//   agreement: yup.boolean().oneOf([true], e.agreementOptions).required(),
-// });
-
 export default function App() {
   // ✨ TASK: BUILD YOUR STATES HERE
   // You will need states to track (1) the form, (2) the validation errors,
@@ -70,11 +75,11 @@ export default function App() {
   // Whenever the state of the form changes, validate it against the schema
   // and update the state that tracks whether the form is submittable.
 
-  // useEffect(() => {
-  //   formSchema.isValid(formValues).then((isValid) => {
-  //     setEnabled(isValid);
-  //   });
-  // }, [formValues]);
+  useEffect(() => {
+    formSchema.isValid(formValues).then((isValid) => {
+      setEnabled(isValid);
+    });
+  }, [formValues]);
 
   const onChange = (evt) => {
     // ✨ TASK: IMPLEMENT YOUR INPUT CHANGE HANDLER
@@ -94,7 +99,17 @@ export default function App() {
     // in the states you have reserved for them, and the form
     // should be re-enabled.
     evt.preventDefault();
-    axios.post("https://webapis.bloomtechdev.com/registration");
+    axios
+      .post("https://webapis.bloomtechdev.com/registration", formValues)
+      .then((res) => {
+        setFormValues(initialFormValues);
+        setFormSuccess(res.data.message);
+        setFormFailure();
+      })
+      .catch((err) => {
+        setFormFailure(err.response.data.message);
+        setFormSuccess();
+      });
   };
 
   return (
@@ -185,7 +200,7 @@ export default function App() {
         </div>
 
         <div>
-          <input onSubmit={onSubmit} type="submit" disabled={false} />
+          <input onSubmit={onSubmit} type="submit" disabled={!enabled} />
         </div>
       </form>
     </div>
