@@ -89,10 +89,10 @@ export default function App() {
     value = type === "checkbox" ? checked : value;
     setFormValues({ ...formValues, [name]: value });
     yup
-    .reach(formSchema, name)
-    .validate(value)
-    .then(() => setFormErrors({ ...formErrors, [name]: "" }))
-    .catch(err => setFormErrors({ ...formErrors, [name]: err.errors[0] }))
+      .reach(formSchema, name)
+      .validate(value)
+      .then(() => setFormErrors({ ...formErrors, [name]: "" }))
+      .catch((err) => setFormErrors({ ...formErrors, [name]: err.errors[0] }));
   };
   const onSubmit = (evt) => {
     // ✨ TASK: IMPLEMENT YOUR SUBMIT HANDLER
